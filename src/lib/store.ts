@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { AnalysisResult, EvidenceItem, MediaType, RiskLevel, ScoreContribution } from "./analysis/types";
+import type { AnalysisResult, EvidenceItem, MediaType, Modality, RiskLevel, ScoreContribution } from "./analysis/types";
+import type { FusionDetail, ModelInference } from "./ml/types";
 
 export interface StoredAnalysis extends AnalysisResult {
   createdAt: string;
@@ -26,9 +27,23 @@ type Row = {
   scoring_version: string;
   processing_time: number | null;
   created_at: string;
+  image_model_name?: string | null;
+  image_model_version?: string | null;
+  image_prediction?: string | null;
+  image_ai_probability?: number | null;
+  image_model_status?: string | null;
+  audio_model_name?: string | null;
+  audio_model_version?: string | null;
+  audio_prediction?: string | null;
+  audio_spoof_probability?: number | null;
+  audio_model_status?: string | null;
+  model_errors?: unknown;
+  image_model_meta?: unknown;
+  audio_model_meta?: unknown;
 };
 
 function toStored(row: Row): StoredAnalysis {
+  const features = (row.features ?? {}) as Record<string, unknown>;
   return {
     analysisId: row.analysis_id,
     mediaType: row.media_type as MediaType,
@@ -40,7 +55,7 @@ function toStored(row: Row): StoredAnalysis {
     finalScore: Number(row.final_score),
     confidence: Number(row.confidence),
     riskLevel: row.risk_level as RiskLevel,
-    features: (row.features ?? {}) as Record<string, unknown>,
+    features,
     evidence: (row.evidence ?? []) as EvidenceItem[],
     scoreContributions: (row.score_contributions ?? []) as ScoreContribution[],
     explanation: row.explanation,
@@ -49,6 +64,10 @@ function toStored(row: Row): StoredAnalysis {
     scoringVersion: row.scoring_version,
     processingTime: row.processing_time === null ? 0 : Number(row.processing_time),
     createdAt: row.created_at,
+    imageModel: (row.image_model_meta ?? null) as ModelInference | null,
+    audioModel: (row.audio_model_meta ?? null) as ModelInference | null,
+    fusion: (features["fusion"] ?? {}) as Partial<Record<Modality, FusionDetail>>,
+    modelErrors: (row.model_errors ?? []) as string[],
   };
 }
 
@@ -74,6 +93,19 @@ export async function saveAnalysis(result: AnalysisResult): Promise<StoredAnalys
       analyzer_version: result.analyzerVersion,
       scoring_version: result.scoringVersion,
       processing_time: result.processingTime,
+      image_model_name: result.imageModel?.modelName ?? null,
+      image_model_version: result.imageModel?.modelVersion ?? null,
+      image_prediction: result.imageModel?.prediction ?? null,
+      image_ai_probability: result.imageModel?.probability ?? null,
+      image_model_status: result.imageModel?.status ?? null,
+      audio_model_name: result.audioModel?.modelName ?? null,
+      audio_model_version: result.audioModel?.modelVersion ?? null,
+      audio_prediction: result.audioModel?.prediction ?? null,
+      audio_spoof_probability: result.audioModel?.probability ?? null,
+      audio_model_status: result.audioModel?.status ?? null,
+      model_errors: result.modelErrors as never,
+      image_model_meta: (result.imageModel ?? null) as never,
+      audio_model_meta: (result.audioModel ?? null) as never,
     })
     .select()
     .single();
