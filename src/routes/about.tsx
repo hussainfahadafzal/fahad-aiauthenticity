@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
 import { ANALYZER_VERSION, DISCLAIMER, SCORING_VERSION } from "@/lib/analysis/types";
+import { DEFAULT_SETTINGS } from "@/lib/analysis/config";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
