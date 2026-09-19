@@ -71,8 +71,9 @@ function MethodologyPage() {
     <AppShell>
       <h1 className="text-2xl font-semibold">Methodology</h1>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        AuthenticityAI is a signal-measurement system, not a trained classifier. Every number in a
-        report is derived from the content you submit, using the pipeline below.
+        AuthenticityAI combines interpretable signal measurement with inference from publicly
+        available pretrained classifiers. It trains no model of its own. Every number in a report is
+        derived from the content you submit or from a real model response — never from a placeholder.
       </p>
 
       <section className="mt-8">
