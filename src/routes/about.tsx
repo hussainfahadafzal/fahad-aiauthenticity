@@ -56,10 +56,22 @@ function AboutPage() {
         <section className="mt-8">
           <h2 className="text-lg font-semibold">Ethics and honest scope</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-            <li>No trained deepfake classifier is used, and none is claimed.</li>
+            <li>
+              No model is trained from scratch here. The project integrates publicly available
+              pretrained classifiers and combines their real probabilities with interpretable
+              modality features through a deterministic fusion step.
+            </li>
+            <li>
+              Upstream training data is only as documented by each model’s publisher; where the
+              manifest is incomplete the report says so.
+            </li>
+            <li>
+              No prediction is ever simulated. If a model is not configured or unreachable, the
+              status is shown as such and the risk is calculated from local signals alone.
+            </li>
             <li>No accuracy figure is reported, because no labelled evaluation is performed.</li>
             <li>Results must never be used as forensic proof or to accuse a person.</li>
-            <li>Every score can be traced back to the exact measurement that produced it.</li>
+            <li>Every score can be traced back to the exact measurement or model response that produced it.</li>
           </ul>
         </section>
 
