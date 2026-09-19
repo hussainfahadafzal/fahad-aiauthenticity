@@ -64,6 +64,10 @@ function Dashboard() {
   const avgConfidence =
     total === 0 ? 0 : Math.round(rows.reduce((a, r) => a + r.confidence, 0) / total);
   const highRisk = rows.filter((r) => r.riskLevel === "High" || r.riskLevel === "Very High").length;
+  const mlAssisted = rows.filter(
+    (r) => isModelUsable(r.imageModel) || isModelUsable(r.audioModel),
+  ).length;
+  const fallback = total - mlAssisted;
 
   const riskData = ["Low", "Moderate", "High", "Very High"]
     .map((level) => ({ name: level, value: rows.filter((r) => r.riskLevel === level).length }))
