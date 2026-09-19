@@ -19,6 +19,7 @@ import { FlaskConical } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { listAnalyses } from "@/lib/store";
+import { isModelUsable } from "@/lib/ml/types";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -64,6 +65,10 @@ function Dashboard() {
   const avgConfidence =
     total === 0 ? 0 : Math.round(rows.reduce((a, r) => a + r.confidence, 0) / total);
   const highRisk = rows.filter((r) => r.riskLevel === "High" || r.riskLevel === "Very High").length;
+  const mlAssisted = rows.filter(
+    (r) => isModelUsable(r.imageModel) || isModelUsable(r.audioModel),
+  ).length;
+  const fallback = total - mlAssisted;
 
   const riskData = ["Low", "Moderate", "High", "Very High"]
     .map((level) => ({ name: level, value: rows.filter((r) => r.riskLevel === level).length }))
@@ -123,6 +128,19 @@ function Dashboard() {
               label="High / very high"
               value={String(highRisk)}
               sub={`${Math.round((highRisk / total) * 100)}% of all analyses`}
+            />
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat
+              label="ML-assisted analyses"
+              value={String(mlAssisted)}
+              sub="A pretrained classifier returned a real probability"
+            />
+            <Stat
+              label="Local-only (fallback)"
+              value={String(fallback)}
+              sub="Model unavailable — local signal analysis used"
             />
           </div>
 

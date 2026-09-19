@@ -38,32 +38,65 @@ export const explainAnalysis = createServerFn({ method: "POST" })
       ),
     ].join("\n");
 
+    const instructions =
+      "You explain content-authenticity analysis results for an academic forensics tool. Use ONLY the measured values given to you. Never invent numbers, never claim certainty, never state that content is definitely real or fake. Write 3 short paragraphs: what was measured, what it suggests, and what it cannot prove. Keep it under 180 words.";
+
     try {
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          "Lovable-API-Key": apiKey,
+          "X-Lovable-AIG-SDK": "fetch",
         },
         body: JSON.stringify({
-          model: "google/gemini-3.8-flash",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You explain content-authenticity analysis results for an academic forensics tool. Use ONLY the measured values given to you. Never invent numbers, never claim certainty, never state that content is definitely real or fake. Write 3 short paragraphs: what was measured, what it suggests, and what it cannot prove. Max 180 words.",
-            },
-            { role: "user", content: prompt },
-          ],
+          model: "openai/gpt-6-astra",
+          instructions,
+          input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }],
+          stream: true,
+          store: false,
+          reasoning: { effort: "low", summary: "auto" },
         }),
       });
-      if (!response.ok) {
+      if (!response.ok || !response.body) {
         return { explanation: null as string | null, error: `AI gateway error ${response.status}` };
       }
-      const json = (await response.json()) as {
-        choices?: { message?: { content?: string } }[];
-      };
-      const content = json.choices?.[0]?.message?.content ?? null;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let text = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (!payload || payload === "[DONE]") continue;
+          try {
+            const event = JSON.parse(payload) as {
+              type?: string;
+              delta?: string;
+              response?: { output_text?: string };
+            };
+            if (event.type === "response.output_text.delta" && typeof event.delta === "string") {
+              text += event.delta;
+            } else if (event.type === "response.completed" && event.response?.output_text) {
+              if (!text) text = event.response.output_text;
+            }
+          } catch {
+            // ignore keep-alive or partial frames
+          }
+        }
+      }
+
+      const content = text.trim();
+      if (!content) {
+        return { explanation: null as string | null, error: "AI explanation returned no text" };
+      }
       return { explanation: content, error: null as string | null };
     } catch {
       return { explanation: null as string | null, error: "AI explanation request failed" };

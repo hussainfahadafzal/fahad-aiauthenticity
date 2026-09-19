@@ -103,6 +103,11 @@ function AnalyzePage() {
 
       const saved = await saveAnalysis(result);
       toast.success(`Analysis complete — risk ${saved.finalScore}/100 (${saved.riskLevel})`);
+      if (result.modelErrors.length > 0) {
+        toast.warning("ML model unavailable — using local signal analysis", {
+          description: result.modelErrors[0],
+        });
+      }
       void navigate({ to: "/results/$id", params: { id: saved.analysisId } });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Analysis failed");
@@ -116,8 +121,9 @@ function AnalyzePage() {
       <div className="mx-auto max-w-4xl">
         <h1 className="text-2xl font-semibold">New analysis</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Everything is measured from your actual input in this browser session. Nothing is guessed
-          from the filename.
+          Signals are measured from your actual input in this browser session, and — when a model
+          token is configured — the bytes are also sent to a public pretrained classifier. Nothing is
+          guessed from the filename, and an unreachable model is always reported as such.
         </p>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as MediaType)} className="mt-6">

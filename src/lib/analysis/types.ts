@@ -1,3 +1,5 @@
+import type { FusionDetail, ModelInference } from "@/lib/ml/types";
+
 export type MediaType = "image" | "audio" | "text" | "multimodal";
 export type Modality = "image" | "audio" | "text";
 export type Severity = "info" | "low" | "moderate" | "high";
@@ -39,6 +41,14 @@ export interface ScoreContribution {
 }
 
 export interface AnalysisResult {
+  /** Pretrained image classifier result, or an explicit unavailable status. */
+  imageModel: ModelInference | null;
+  /** Pretrained audio classifier result, or an explicit unavailable status. */
+  audioModel: ModelInference | null;
+  /** Per-modality fusion of local feature score and model probability. */
+  fusion: Partial<Record<Modality, FusionDetail>>;
+  /** Human-readable inference problems, empty when every requested model answered. */
+  modelErrors: string[];
   analysisId: string;
   mediaType: MediaType;
   filename: string | null;
@@ -58,8 +68,8 @@ export interface AnalysisResult {
   processingTime: number;
 }
 
-export const ANALYZER_VERSION = "1.0.0";
-export const SCORING_VERSION = "1.0.0";
+export const ANALYZER_VERSION = "1.1.0";
+export const SCORING_VERSION = "2.0.0";
 
 export const DISCLAIMER =
   "AuthenticityAI provides an analytical risk assessment based on measurable content signals. Results are not definitive forensic proof.";
