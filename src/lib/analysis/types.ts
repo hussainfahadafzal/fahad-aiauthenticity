@@ -1,3 +1,5 @@
+import type { FusionDetail, ModelInference } from "@/lib/ml/types";
+
 export type MediaType = "image" | "audio" | "text" | "multimodal";
 export type Modality = "image" | "audio" | "text";
 export type Severity = "info" | "low" | "moderate" | "high";
