@@ -131,6 +131,19 @@ function Dashboard() {
             />
           </div>
 
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat
+              label="ML-assisted analyses"
+              value={String(mlAssisted)}
+              sub="A pretrained classifier returned a real probability"
+            />
+            <Stat
+              label="Local-only (fallback)"
+              value={String(fallback)}
+              sub="Model unavailable — local signal analysis used"
+            />
+          </div>
+
           <div className="mt-6 grid gap-4 xl:grid-cols-2">
             <section className="panel p-4">
               <h2 className="text-sm font-semibold">Risk level distribution</h2>
