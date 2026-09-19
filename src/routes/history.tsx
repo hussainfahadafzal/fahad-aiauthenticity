@@ -25,6 +25,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { riskTextClass } from "@/components/ScoreDial";
+import { ModelStatusBadge } from "@/components/ModelStatusBadge";
+import { isModelUsable } from "@/lib/ml/types";
 import { deleteAnalysis, listAnalyses } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
