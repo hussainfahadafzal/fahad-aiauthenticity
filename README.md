@@ -11,7 +11,12 @@ and an honest statement of limitations.
 
 ## Honest scope
 
-- No trained deepfake classifier, and none is claimed.
+- **No model is trained from scratch.** The project integrates publicly available pretrained
+  classifiers and fuses their real probabilities with interpretable modality features.
+- If no inference token is configured, or the endpoint fails, the status is reported as
+  `NOT_CONFIGURED` / `UNAVAILABLE` / `ERROR` and the report states
+  *"ML model unavailable — using local signal analysis. Final risk calculated without ML model
+  inference."* No prediction is ever simulated.
 - No random numbers, hardcoded verdicts or fake accuracy percentages.
 - No filename-based detection — decisions come from decoded content only.
 - No seeded demo history: the dashboard is empty until you run a real analysis.
