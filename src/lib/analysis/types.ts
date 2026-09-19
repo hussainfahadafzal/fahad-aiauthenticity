@@ -39,6 +39,14 @@ export interface ScoreContribution {
 }
 
 export interface AnalysisResult {
+  /** Pretrained image classifier result, or an explicit unavailable status. */
+  imageModel: ModelInference | null;
+  /** Pretrained audio classifier result, or an explicit unavailable status. */
+  audioModel: ModelInference | null;
+  /** Per-modality fusion of local feature score and model probability. */
+  fusion: Partial<Record<Modality, FusionDetail>>;
+  /** Human-readable inference problems, empty when every requested model answered. */
+  modelErrors: string[];
   analysisId: string;
   mediaType: MediaType;
   filename: string | null;
