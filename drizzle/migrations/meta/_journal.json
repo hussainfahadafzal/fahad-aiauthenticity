@@ -8,6 +8,13 @@
       "when": 1789746644452,
       "tag": "0000_create_analyses",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789826367973,
+      "tag": "0001_add_model_inference_columns",
+      "breakpoints": true
     }
   ]
 }
