@@ -104,14 +104,19 @@ function MethodologyPage() {
             note={`Defaults: image ${DEFAULT_SETTINGS.weights.image}, audio ${DEFAULT_SETTINGS.weights.audio}, text ${DEFAULT_SETTINGS.weights.text}. Absent modalities are dropped before normalising.`}
           />
           <Formula
+            title="Early fusion inside a modality"
+            expression={`score_m = round( (1−λ)·featureScore_m + λ·100·P_model(synthetic) )\nλ = 0 when model status ≠ AVAILABLE`}
+            note={`λ defaults to ${DEFAULT_SETTINGS.mlWeight} and is configurable in Settings. If inference is NOT_CONFIGURED, UNAVAILABLE or ERROR the modality score is 100% local signals and the report says so.`}
+          />
+          <Formula
             title="Fused risk score"
             expression={`final = round( Σ_{m ∈ present} score_m · w'_m )`}
             note="Only modalities actually supplied take part in the fusion."
           />
           <Formula
             title="Confidence (independent of risk)"
-            expression={`confidence = 100 · ( 0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence )`}
-            note="Completeness = measurable feature groups; validity = input size/length adequacy; coverage = measured signals ÷ expected signals."
+            expression={`base = 100 · ( 0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence )\nconfidence = clamp( base + 5·modelsUsed − 8·modelsMissing , 0 , 99 )`}
+            note="Completeness = measurable feature groups; validity = input size/length adequacy; coverage = measured signals ÷ expected signals. Successful model inference raises confidence; a model that was requested but unreachable lowers it."
           />
           <Formula
             title="Shannon entropy (image texture)"
