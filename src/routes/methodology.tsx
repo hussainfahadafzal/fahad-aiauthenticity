@@ -27,10 +27,31 @@ const STAGES = [
   { n: 1, title: "Input", body: "File or text is received in the browser. No filename heuristics are used anywhere." },
   { n: 2, title: "Decode", body: "Canvas 2D for images, AudioContext.decodeAudioData for audio, tokenisation for text." },
   { n: 3, title: "Feature extraction", body: "Statistical descriptors: pixel/frequency statistics, FFT spectral measures, stylometry." },
-  { n: 4, title: "Signal evaluation", body: "Each feature is compared with a documented threshold and becomes an evidence item." },
-  { n: 5, title: "Scoring", body: "Evidence contributions are summed per modality, then fused with normalised weights." },
-  { n: 6, title: "Confidence", body: "A separate value from data completeness, feature validity and signal coverage." },
-  { n: 7, title: "Persistence", body: "The full report — features, evidence, contributions — is stored for review and export." },
+  { n: 4, title: "Model inference", body: "Image and audio bytes are sent server-side to a public pretrained classifier; an unreachable model is reported, never simulated." },
+  { n: 5, title: "Signal evaluation", body: "Each feature is compared with a documented threshold and becomes an evidence item." },
+  { n: 6, title: "Early fusion", body: "Per modality: forensic feature score blended with the model probability (default 50/50); 100% features when inference is unavailable." },
+  { n: 7, title: "Late fusion", body: "Modality scores are combined with weights re-normalised over the modalities present." },
+  { n: 8, title: "Confidence", body: "A separate value from completeness, feature validity, signal coverage and whether a model could be consulted." },
+  { n: 9, title: "Persistence", body: "The full report — features, evidence, model status, contributions — is stored for review and export." },
+];
+
+const MODEL_NOTES = [
+  {
+    title: "Image classifier",
+    body: `Default ${DEFAULT_SETTINGS.imageModel} — a publicly published transformer image classifier fine-tuned upstream to separate human-made from diffusion-generated images. Integrated, not trained here.`,
+  },
+  {
+    title: "Audio classifier",
+    body: `Default ${DEFAULT_SETTINGS.audioModel} — a publicly published wav2vec2 audio-classification checkpoint fine-tuned upstream on bona-fide versus synthesised speech. Integrated, not trained here.`,
+  },
+  {
+    title: "Text",
+    body: "No text classifier is active. Text risk comes entirely from deterministic linguistic features: type-token ratio, hapax ratio, repeated n-grams, sentence-length variance and punctuation statistics.",
+  },
+  {
+    title: "Dataset provenance",
+    body: "Each upstream model card is linked in every report. Upstream training sets are not fully published, so no accuracy figure is claimed and no threshold is calibrated against a labelled benchmark.",
+  },
 ];
 
 function Formula({ title, expression, note }: { title: string; expression: string; note: string }) {
