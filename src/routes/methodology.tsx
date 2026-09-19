@@ -142,12 +142,31 @@ function MethodologyPage() {
         </div>
       </section>
 
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold">Pretrained model integration</h2>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {MODEL_NOTES.map((m) => (
+            <div key={m.title} className="panel p-4">
+              <h3 className="text-sm font-semibold">{m.title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{m.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+          Inference runs server-side so the API token never reaches the browser. If the token is
+          absent the status is NOT_CONFIGURED; if the endpoint fails it is UNAVAILABLE or ERROR. In
+          every one of those cases the report states “ML model unavailable — using local signal
+          analysis” and the final risk is calculated without model inference.
+        </p>
+      </section>
+
       <section className="panel mt-10 p-5">
         <h2 className="text-lg font-semibold">Determinism guarantee</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The engine contains no random number generation, no pretrained weights and no
-          filename inspection. Re-analysing identical content with identical settings reproduces
-          identical features, identical evidence and an identical score.
+          The local engine contains no random number generation and no filename inspection.
+          Re-analysing identical content with identical settings reproduces identical features,
+          identical evidence and an identical feature score. Model probabilities come from a fixed
+          upstream checkpoint revision, which is recorded in each report.
         </p>
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">{DISCLAIMER}</p>
       </section>
