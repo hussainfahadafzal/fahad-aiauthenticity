@@ -19,6 +19,7 @@ import { FlaskConical } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { listAnalyses } from "@/lib/store";
+import { isModelUsable } from "@/lib/ml/types";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
