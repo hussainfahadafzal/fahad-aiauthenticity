@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { checkModelAvailability, type ModelAvailability } from "@/lib/ml/inference.functions";
 import {
   DEFAULT_SETTINGS,
   loadSettings,
