@@ -149,6 +149,8 @@ function HistoryPage() {
                 <th scope="col" className="px-4 py-3">Score</th>
                 <th scope="col" className="px-4 py-3">Risk</th>
                 <th scope="col" className="px-4 py-3">Confidence</th>
+                <th scope="col" className="px-4 py-3">Model status</th>
+                <th scope="col" className="px-4 py-3">Model prediction</th>
                 <th scope="col" className="px-4 py-3">Date</th>
                 <th scope="col" className="px-4 py-3 text-right">Actions</th>
               </tr>
