@@ -36,9 +36,10 @@ function AboutPage() {
         <h1 className="text-2xl font-semibold">About AuthenticityAI</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           AuthenticityAI is an academic and portfolio project that demonstrates an explainable
-          approach to content-authenticity assessment. Instead of claiming a verdict, it measures
-          signals that can be computed, shows every measurement, and explains what those
-          measurements can and cannot support.
+          approach to content-authenticity assessment. It measures signals that can be computed,
+          optionally consults publicly available pretrained classifiers, shows every measurement and
+          model response, and explains what they can and cannot support. It does not train models
+          from scratch.
         </p>
 
         <section className="mt-8">
