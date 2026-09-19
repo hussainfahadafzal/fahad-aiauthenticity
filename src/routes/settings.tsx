@@ -33,6 +33,31 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const [settings, setSettings] = useState<EngineSettings>(DEFAULT_SETTINGS);
+  const [availability, setAvailability] = useState<ModelAvailability | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  async function runCheck() {
+    setChecking(true);
+    try {
+      const result = await checkModelAvailability({
+        data: {
+          imageModel: settings.imageModel,
+          audioModel: settings.audioModel,
+          ...(settings.inferenceEndpoint ? { endpoint: settings.inferenceEndpoint } : {}),
+        },
+      });
+      setAvailability(result);
+      if (!result.tokenConfigured) {
+        toast.error("No inference token configured — analyses will use local signals only");
+      } else {
+        toast.success("Inference configuration checked");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Status check failed");
+    } finally {
+      setChecking(false);
+    }
+  }
 
   useEffect(() => {
     setSettings(loadSettings());
