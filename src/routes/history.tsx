@@ -168,6 +168,32 @@ function HistoryPage() {
                     {r.riskLevel}
                   </td>
                   <td className="px-4 py-3 font-mono">{r.confidence}%</td>
+                  <td className="px-4 py-3">
+                    <div className="space-y-1">
+                      {[r.imageModel, r.audioModel].filter(Boolean).length === 0 ? (
+                        <span className="text-xs text-muted-foreground">No model requested</span>
+                      ) : (
+                        [r.imageModel, r.audioModel]
+                          .filter((m): m is NonNullable<typeof m> => Boolean(m))
+                          .map((m) => (
+                            <ModelStatusBadge key={m.modality} status={m.status} className="block" />
+                          ))
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    {[r.imageModel, r.audioModel].filter(isModelUsable).length === 0 ? (
+                      <span className="text-muted-foreground">Local analysis used</span>
+                    ) : (
+                      [r.imageModel, r.audioModel]
+                        .filter(isModelUsable)
+                        .map((m) => (
+                          <p key={m!.modality} className="font-mono">
+                            {m!.modality}: {m!.prediction} ({Math.round((m!.probability ?? 0) * 100)}%)
+                          </p>
+                        ))
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(r.createdAt).toLocaleString()}
                   </td>
