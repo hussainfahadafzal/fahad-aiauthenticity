@@ -68,8 +68,8 @@ export interface AnalysisResult {
   processingTime: number;
 }
 
-export const ANALYZER_VERSION = "1.0.0";
-export const SCORING_VERSION = "1.0.0";
+export const ANALYZER_VERSION = "1.1.0";
+export const SCORING_VERSION = "2.0.0";
 
 export const DISCLAIMER =
   "AuthenticityAI provides an analytical risk assessment based on measurable content signals. Results are not definitive forensic proof.";
