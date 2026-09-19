@@ -142,7 +142,7 @@ function HistoryPage() {
 
       {rows.length > 0 && (
         <div className="panel mt-6 overflow-x-auto">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[980px] text-sm">
             <caption className="sr-only">Stored analyses</caption>
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-muted-foreground">
