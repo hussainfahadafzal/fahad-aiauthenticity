@@ -103,6 +103,11 @@ function AnalyzePage() {
 
       const saved = await saveAnalysis(result);
       toast.success(`Analysis complete — risk ${saved.finalScore}/100 (${saved.riskLevel})`);
+      if (result.modelErrors.length > 0) {
+        toast.warning("ML model unavailable — using local signal analysis", {
+          description: result.modelErrors[0],
+        });
+      }
       void navigate({ to: "/results/$id", params: { id: saved.analysisId } });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Analysis failed");
