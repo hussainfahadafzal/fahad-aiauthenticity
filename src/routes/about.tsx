@@ -23,7 +23,8 @@ const STACK = [
   ["Image analysis", "Canvas 2D pixel access, Sobel/Laplacian operators, histogram entropy, EXIF byte scan"],
   ["Audio analysis", "Web Audio AudioContext decoding, Hann windowing, radix-2 FFT, spectral descriptors"],
   ["Text analysis", "Tokenisation, stylometry, n-gram repetition, punctuation and register statistics"],
-  ["Persistence", "Managed PostgreSQL through the project backend, one row per analysis with full JSON evidence"],
+  ["Model inference", `Server-side calls to public pretrained classifiers (${DEFAULT_SETTINGS.imageModel} for images, ${DEFAULT_SETTINGS.audioModel} for audio)`],
+  ["Persistence", "Managed PostgreSQL through the project backend, one row per analysis with full JSON evidence and model status"],
   ["Optional AI", "Server-side narrative synthesis constrained to the measured values"],
 ];
 
