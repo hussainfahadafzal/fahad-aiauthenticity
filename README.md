@@ -73,6 +73,32 @@ npm run dev
 Copy `.env.example` to `.env` and fill in your own backend values when running outside the hosted
 environment.
 
+## Environment variables
+
+Copy the template and fill it in locally. `.env` and every other `.env.*` file are git-ignored;
+only `.env.example` (names and placeholders, never real values) belongs in the repository.
+
+```sh
+cp .env.example .env
+```
+
+| Variable | Scope | Purpose |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | browser | Backend API URL. Public by design. |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | browser | Publishable (anon) key. Public by design; row-level security protects the data. |
+| `VITE_SUPABASE_PROJECT_ID` | browser | Backend project identifier. Public by design. |
+| `SUPABASE_URL` | server | Same URL, read by server functions. |
+| `SUPABASE_PUBLISHABLE_KEY` | server | Publishable key for server-side reads. |
+| `LOVABLE_API_KEY` | server only | Enables the optional AI narrative. Provisioned automatically in the hosted environment. |
+
+Rules:
+
+- Only `VITE_`-prefixed variables reach the browser bundle. Never give a private key a `VITE_`
+  prefix, and never hardcode one in `src/`.
+- Server-only values (`LOVABLE_API_KEY`, and a service-role key if you ever self-host) are read
+  inside server function handlers via `process.env` and never shipped to the client.
+- The app works without `LOVABLE_API_KEY`; the deterministic analysis and explanation still run.
+
 ## Database schema (`analyses`)
 
 `id`, `analysis_id`, `media_type`, `filename`, `status`, `image_score`, `audio_score`, `text_score`,

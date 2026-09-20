@@ -18,7 +18,13 @@ export type Database = {
         Row: {
           analysis_id: string
           analyzer_version: string
+          audio_model_meta: Json | null
+          audio_model_name: string | null
+          audio_model_status: string | null
+          audio_model_version: string | null
+          audio_prediction: string | null
           audio_score: number | null
+          audio_spoof_probability: number | null
           confidence: number
           created_at: string
           evidence: Json
@@ -27,9 +33,16 @@ export type Database = {
           filename: string | null
           final_score: number
           id: string
+          image_ai_probability: number | null
+          image_model_meta: Json | null
+          image_model_name: string | null
+          image_model_status: string | null
+          image_model_version: string | null
+          image_prediction: string | null
           image_score: number | null
           limitations: string | null
           media_type: string
+          model_errors: Json
           processing_time: number | null
           risk_level: string
           score_contributions: Json
@@ -40,7 +53,13 @@ export type Database = {
         Insert: {
           analysis_id: string
           analyzer_version?: string
+          audio_model_meta?: Json | null
+          audio_model_name?: string | null
+          audio_model_status?: string | null
+          audio_model_version?: string | null
+          audio_prediction?: string | null
           audio_score?: number | null
+          audio_spoof_probability?: number | null
           confidence: number
           created_at?: string
           evidence?: Json
@@ -49,9 +68,16 @@ export type Database = {
           filename?: string | null
           final_score: number
           id?: string
+          image_ai_probability?: number | null
+          image_model_meta?: Json | null
+          image_model_name?: string | null
+          image_model_status?: string | null
+          image_model_version?: string | null
+          image_prediction?: string | null
           image_score?: number | null
           limitations?: string | null
           media_type: string
+          model_errors?: Json
           processing_time?: number | null
           risk_level: string
           score_contributions?: Json
@@ -62,7 +88,13 @@ export type Database = {
         Update: {
           analysis_id?: string
           analyzer_version?: string
+          audio_model_meta?: Json | null
+          audio_model_name?: string | null
+          audio_model_status?: string | null
+          audio_model_version?: string | null
+          audio_prediction?: string | null
           audio_score?: number | null
+          audio_spoof_probability?: number | null
           confidence?: number
           created_at?: string
           evidence?: Json
@@ -71,9 +103,16 @@ export type Database = {
           filename?: string | null
           final_score?: number
           id?: string
+          image_ai_probability?: number | null
+          image_model_meta?: Json | null
+          image_model_name?: string | null
+          image_model_status?: string | null
+          image_model_version?: string | null
+          image_prediction?: string | null
           image_score?: number | null
           limitations?: string | null
           media_type?: string
+          model_errors?: Json
           processing_time?: number | null
           risk_level?: string
           score_contributions?: Json

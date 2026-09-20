@@ -30,3 +30,34 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (never commit real values) — .env.example is the only one allowed
+.env
+.env.*
+!.env.example
+
+# User uploads
+uploads/
+public/uploads/
+user-uploads/
+
+# Local database files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+supabase/.branches/
+supabase/.temp/
+
+# Build artifacts
+build/
+.vercel/
+.netlify/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+coverage/
