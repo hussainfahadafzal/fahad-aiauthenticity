@@ -99,6 +99,22 @@ Rules:
   inside server function handlers via `process.env` and never shipped to the client.
 - The app works without `LOVABLE_API_KEY`; the deterministic analysis and explanation still run.
 
+### If `.env` was ever committed
+
+`.env` is git-ignored, but an ignore rule does not untrack a file that was already committed. Run
+this once in your clone and push:
+
+```sh
+git rm --cached .env
+git commit -m "Stop tracking .env"
+git push
+```
+
+Only `.env.example` (placeholders) belongs in the repository. In the hosted environment private
+values are stored as platform secrets and injected into the server runtime — never written into a
+committed file.
+
+
 ## Database schema (`analyses`)
 
 `id`, `analysis_id`, `media_type`, `filename`, `status`, `image_score`, `audio_score`, `text_score`,
