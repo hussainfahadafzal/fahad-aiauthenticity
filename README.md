@@ -1,139 +1,1098 @@
 # AuthenticityAI
 
-**AI-Powered Multimodal Content Authenticity & Risk Analysis System**
+## AI-Powered Multimodal Content Authenticity & Risk Analysis System
 
-AuthenticityAI analyses images, audio and text and produces an **explainable authenticity risk
-assessment**: a risk score, a separate confidence value, the measured signals behind every point,
-and an honest statement of limitations.
+AuthenticityAI is a multimodal content analysis system designed to analyze **images, audio, and text** and generate an **explainable authenticity risk assessment**.
 
-> AuthenticityAI provides an analytical risk assessment based on measurable content signals.
-> Results are not definitive forensic proof.
+Instead of making an absolute claim such as "this content is fake" or "this content is real", the system analyzes measurable signals from the submitted content and produces:
 
-## Honest scope
+- 📊 Risk score
+- 🎯 Confidence score
+- 🔍 Evidence contributing to the score
+- 🧠 Explainable analysis
+- ⚠️ Limitations and uncertainty
+- 📈 Historical analysis records
+- 📄 Analysis reports
 
-- No trained deepfake classifier, and none is claimed.
-- No random numbers, hardcoded verdicts or fake accuracy percentages.
-- No filename-based detection — decisions come from decoded content only.
-- No seeded demo history: the dashboard is empty until you run a real analysis.
-- Deterministic: same input + same settings → same features → same score.
+> **Important:** AuthenticityAI provides an analytical risk assessment based on measurable content signals. It is not a forensic verification system, and its results should not be treated as definitive proof of authenticity or manipulation.
 
-## Features
+---
 
-| Modality | Measured signals |
-| --- | --- |
-| Image | Dimensions, aspect ratio, file size, format, bits per pixel, RGB means, brightness, contrast, luma entropy, edge density, Sobel gradients, Laplacian sharpness, flat-region noise floor, 8×8 compression blockiness, unique colour ratio, saturation, EXIF presence (real byte scan) |
-| Audio | Duration, sample rate, channels, RMS energy, peak, crest factor, zero-crossing rate, spectral centroid, 95% rolloff, spectral flatness, centroid stability, frame-energy variation, silence ratio, clipping ratio, dynamic range, waveform + spectrum visualisers |
-| Text | Character/word/sentence/paragraph counts, mean sentence length and variation, type-token ratio, hapax ratio, repeated 4-grams, punctuation statistics and variety, contraction rate, long-word ratio, function-word ratio, paragraph uniformity |
-| Multimodal | Independent per-modality scoring with weight re-normalisation (defaults: image 0.40, audio 0.40, text 0.20). Missing modalities are never scored. |
+## ✨ Key Features
 
-Pages: Landing, Dashboard, New Analysis, Results, History, Reports, Methodology, Settings, About.
+### 🖼️ Image Analysis
 
-## Scoring model
+AuthenticityAI extracts measurable characteristics directly from the decoded image.
 
-```
-score_m    = clamp( Σ evidence contributions , 0 , 100 )
-w'_m       = w_m / Σ_{k ∈ present} w_k
-final      = round( Σ score_m · w'_m )
-confidence = 100 · (0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence)
-```
+The image analyzer evaluates:
 
-Risk bands: `0–30 Low`, `31–60 Moderate`, `61–80 High`, `81–100 Very High` (configurable in Settings;
-each stored report records the thresholds and weights used).
+- Image dimensions
+- Aspect ratio
+- File size
+- Image format
+- Bits per pixel
+- RGB channel statistics
+- Brightness
+- Contrast
+- Luma entropy
+- Edge density
+- Sobel gradient statistics
+- Laplacian sharpness
+- Flat-region noise floor
+- 8×8 compression blockiness
+- Unique colour ratio
+- Saturation statistics
+- EXIF presence
 
-Confidence is deliberately independent of risk: it expresses how trustworthy the measurements are
-(input size/length, signal coverage, feature validity), not how suspicious the content looks.
+The system converts these measurements into evidence items and score contributions.
 
-## Tech stack
+**Important:** Image metadata and statistical artifacts are treated as signals, not proof of manipulation.
 
-- React 19 + TypeScript + Vite, TanStack Start/Router, TanStack Query
-- Tailwind CSS v4, shadcn/ui, Recharts, Lucide icons
-- Canvas 2D, Web Audio API (`decodeAudioData`) and a hand-written radix-2 FFT for signal extraction
-- Managed PostgreSQL persistence (`analyses` table, one row per report with full JSON features,
-  evidence and score contributions)
-- Optional server-side AI narrative that may only explain already-measured values
+---
 
-## Project structure
+### 🎙️ Audio Analysis
 
-```
-src/lib/analysis/     image.ts · audio.ts · text.ts · scoring.ts · engine.ts · config.ts · util.ts
-src/lib/store.ts      persistence helpers (list / get / save / delete)
-src/lib/explain.functions.ts  optional server-side narrative synthesis
-src/components/       AppShell, ScoreDial, EvidenceCard, Dropzone, AudioVisualizer
-src/routes/           index, dashboard, analyze, results.$id, history, reports, methodology, settings, about
-drizzle/migrations/   database schema
-```
+The audio analyzer processes decoded audio using browser audio-processing capabilities.
 
-## Local development
+Measured signals include:
 
-```sh
+- Duration
+- Sample rate
+- Number of channels
+- RMS energy
+- Peak amplitude
+- Crest factor
+- Zero-crossing rate
+- Spectral centroid
+- 95% spectral rolloff
+- Spectral flatness
+- Centroid stability
+- Frame-energy variation
+- Silence ratio
+- Clipping ratio
+- Dynamic range
+
+The application also provides:
+
+- Waveform visualization
+- Spectrum visualization
+- Audio processing status
+- Evidence associated with extracted signals
+
+Short or heavily compressed audio samples may produce less reliable measurements.
+
+---
+
+### 📝 Text Analysis
+
+The text analyzer evaluates statistical and linguistic characteristics of submitted text.
+
+Measured features include:
+
+- Character count
+- Word count
+- Sentence count
+- Paragraph count
+- Mean sentence length
+- Sentence-length variation
+- Type-token ratio
+- Hapax ratio
+- Repeated 4-gram patterns
+- Punctuation statistics
+- Punctuation variety
+- Contraction rate
+- Long-word ratio
+- Function-word ratio
+- Paragraph uniformity
+
+These signals are used to produce an explainable risk assessment.
+
+> Text statistics cannot prove whether text was written by a human or generated by an AI system.
+
+---
+
+## 🔀 Multimodal Analysis
+
+AuthenticityAI can combine multiple modalities into a single analysis.
+
+Supported combinations include:
+
+- Image
+- Audio
+- Text
+- Image + Audio
+- Image + Text
+- Audio + Text
+- Image + Audio + Text
+
+Each modality is analyzed independently before being combined by the scoring engine.
+
+### Default modality weights
+
+| Modality | Weight |
+|---|---:|
+| Image | 40% |
+| Audio | 40% |
+| Text | 20% |
+
+If a modality is missing, its weight is automatically removed and the remaining weights are re-normalized.
+
+For example:
+
+```text
+Image + Audio
+
+Image = 0.40
+Audio = 0.40
+
+Total = 0.80
+
+Normalized:
+Image = 0.40 / 0.80 = 0.50
+Audio = 0.40 / 0.80 = 0.50
+
+This prevents missing modalities from artificially lowering the final score.
+
+🧠 Analysis & Scoring System
+
+AuthenticityAI uses a deterministic evidence-based scoring pipeline.
+
+The system does not generate random scores or use filename-based assumptions.
+
+Modality score
+
+For each modality:
+
+score_m = clamp(
+    Σ evidence contributions,
+    0,
+    100
+)
+
+Each evidence signal contributes according to the configured scoring rules.
+
+Multimodal fusion
+
+For the available modalities:
+
+w'_m = w_m / Σ w_k
+
+The final score is then:
+
+final = round(
+    Σ score_m × w'_m
+)
+
+This means the final score depends only on the modalities that were actually submitted.
+
+🎯 Risk Levels
+
+AuthenticityAI uses the following configurable risk bands:
+
+Score	Risk Level
+0–30	🟢 Low
+31–60	🟡 Moderate
+61–80	🟠 High
+81–100	🔴 Very High
+
+These thresholds are project-defined analytical thresholds.
+
+They are not universal forensic standards.
+
+The thresholds can be configured through the application's settings, and each stored analysis records the configuration used at the time of analysis.
+
+🎯 Confidence Score
+
+Risk and confidence are deliberately treated as two different concepts.
+
+Risk
+
+Risk answers:
+
+"How unusual or suspicious are the measured signals according to our scoring rules?"
+
+Confidence
+
+Confidence answers:
+
+"How reliable and sufficiently supported are the measurements used to produce this assessment?"
+
+The confidence calculation is:
+
+confidence =
+100 × (
+    0.30 × completeness
+  + 0.30 × validity
+  + 0.20 × coverage
+  + 0.20 × meanSignalConfidence
+)
+
+Therefore:
+
+High risk ≠ high confidence
+Low risk ≠ high confidence
+
+A piece of content can have a high risk score while still having low confidence if the available evidence is incomplete or unreliable.
+
+🔬 Evidence-First Architecture
+
+AuthenticityAI follows an evidence-first design.
+
+Instead of directly producing:
+
+FAKE
+
+the system follows:
+
+Input
+  ↓
+Content Decoding
+  ↓
+Feature Extraction
+  ↓
+Signal Validation
+  ↓
+Evidence Generation
+  ↓
+Score Contributions
+  ↓
+Risk Score
+  ↓
+Confidence Score
+  ↓
+Explanation
+
+Every assessment is therefore connected to measurable signals.
+
+🤖 AI Explanation Layer
+
+AuthenticityAI can optionally use a server-side AI model to generate a natural-language explanation of the analysis.
+
+The AI explanation layer does not independently decide whether content is authentic.
+
+Instead, it receives already-measured information such as:
+
+Risk Score
+Confidence
+Measured Features
+Evidence
+Score Contributions
+Limitations
+
+and converts those values into a human-readable explanation.
+
+Important design principle
+
+The AI explanation layer must not invent:
+
+Measurements
+Evidence
+Scores
+Dataset results
+Model accuracy
+Detection claims
+
+The deterministic analysis engine remains the source of the actual measurements.
+
+If the optional AI service is unavailable, AuthenticityAI continues to operate using deterministic analysis and fallback explanations.
+
+🏗️ System Architecture
+                         ┌──────────────────────┐
+                         │        User          │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │   React Frontend     │
+                         │ TypeScript + Vite    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │   Analysis Engine    │
+                         └──────────┬───────────┘
+                                    │
+                ┌───────────────────┼───────────────────┐
+                │                   │                   │
+                ▼                   ▼                   ▼
+        ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+        │    Image     │    │    Audio     │    │     Text     │
+        │   Analyzer   │    │   Analyzer   │    │   Analyzer   │
+        └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+               │                   │                   │
+               └───────────────────┼───────────────────┘
+                                   ▼
+                         ┌──────────────────────┐
+                         │   Evidence Engine    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │    Risk Scoring      │
+                         │      Engine          │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Confidence Engine    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Optional AI         │
+                         │ Explanation Layer   │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ PostgreSQL Database  │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Dashboard / Reports  │
+                         └──────────────────────┘
+🛠️ Technology Stack
+Frontend
+React 19
+TypeScript
+Vite
+TanStack Start / Router
+TanStack Query
+Tailwind CSS v4
+shadcn/ui
+Recharts
+Lucide React
+Browser Analysis Technologies
+Image
+HTML5 Canvas
+Pixel-level image analysis
+Image decoding
+Statistical feature extraction
+Audio
+Web Audio API
+AudioContext
+decodeAudioData
+Waveform processing
+Spectrum analysis
+Hand-written radix-2 FFT
+Text
+TypeScript-based statistical analysis
+Lexical statistics
+Sentence statistics
+N-gram analysis
+Backend & Persistence
+Lovable Cloud
+PostgreSQL
+Drizzle
+Server-side functions
+Persistent analysis history
+Optional AI
+Server-side AI narrative generation
+Lovable AI integration
+AI explanation based on deterministic measurements
+
+The optional AI layer is not the primary scoring engine.
+
+📁 Project Structure
+AuthenticityAI/
+│
+├── .lovable/
+│
+├── public/
+│
+├── src/
+│   │
+│   ├── components/
+│   │   ├── AppShell
+│   │   ├── ScoreDial
+│   │   ├── EvidenceCard
+│   │   ├── Dropzone
+│   │   └── AudioVisualizer
+│   │
+│   ├── lib/
+│   │   ├── analysis/
+│   │   │   ├── image.ts
+│   │   │   ├── audio.ts
+│   │   │   ├── text.ts
+│   │   │   ├── scoring.ts
+│   │   │   ├── engine.ts
+│   │   │   ├── config.ts
+│   │   │   └── util.ts
+│   │   │
+│   │   ├── store.ts
+│   │   └── explain.functions.ts
+│   │
+│   └── routes/
+│       ├── index
+│       ├── dashboard
+│       ├── analyze
+│       ├── results.$id
+│       ├── history
+│       ├── reports
+│       ├── methodology
+│       ├── settings
+│       └── about
+│
+├── drizzle/
+│   └── migrations/
+│
+├── supabase/
+│
+├── .env.example
+├── .gitignore
+├── LICENSE
+├── package.json
+├── README.md
+├── tsconfig.json
+└── vite.config.ts
+🖥️ Application Pages
+
+AuthenticityAI contains the following major pages.
+
+1. Landing Page
+
+Introduces:
+
+AuthenticityAI
+Multimodal analysis
+Evidence-first methodology
+Risk and confidence concepts
+Supported modalities
+Limitations
+2. Dashboard
+
+Displays:
+
+Total analyses
+Image analyses
+Audio analyses
+Text analyses
+Average risk
+Average confidence
+Risk distribution
+Recent analyses
+
+The dashboard uses stored analysis data rather than fabricated statistics.
+
+3. New Analysis
+
+Allows users to select:
+
+Image
+Audio
+Text
+Multimodal
+
+Users can upload supported media or enter text.
+
+The interface provides:
+
+Input validation
+File size validation
+Processing state
+Error handling
+Analysis progress
+Results navigation
+4. Results
+
+Displays:
+
+Final risk score
+Risk level
+Confidence
+Modality scores
+Evidence
+Signal measurements
+Score contributions
+AI explanation
+Limitations
+Processing time
+Analyzer version
+Scoring version
+5. History
+
+Stores previous analyses.
+
+Users can:
+
+Search analyses
+Filter by modality
+Filter by risk level
+Open previous results
+Delete analyses
+Refresh history
+6. Reports
+
+Provides stored analysis reports in a structured format.
+
+Reports include:
+
+Analysis ID
+Input metadata
+Scores
+Confidence
+Evidence
+Explanation
+Limitations
+Scoring configuration
+7. Methodology
+
+Documents:
+
+Image analysis methodology
+Audio analysis methodology
+Text analysis methodology
+Multimodal fusion
+Risk scoring
+Confidence calculation
+Limitations
+Interpretation guidelines
+8. Settings
+
+Allows configuration of:
+
+Risk thresholds
+Modality weights
+Analysis preferences
+AI explanation availability
+Application settings
+
+Each analysis stores the scoring configuration used when it was created.
+
+9. About
+
+Contains:
+
+Project information
+Technology stack
+Development methodology
+Limitations
+Future scope
+Responsible-use statement
+🗄️ Database
+
+AuthenticityAI stores analysis reports in a PostgreSQL database.
+
+analyses
+
+The main table contains:
+
+Column	Description
+id	Database identifier
+analysis_id	Public analysis identifier
+media_type	Image, audio, text or multimodal
+filename	Original filename where applicable
+status	Analysis processing status
+image_score	Image risk score
+audio_score	Audio risk score
+text_score	Text risk score
+final_score	Final combined score
+confidence	Confidence value
+risk_level	Low / Moderate / High / Very High
+features	Extracted measurements
+evidence	Evidence generated from measurements
+score_contributions	Individual scoring contributions
+explanation	Human-readable explanation
+limitations	Known limitations
+analyzer_version	Analyzer version
+scoring_version	Scoring version
+processing_time	Processing duration
+created_at	Creation timestamp
+🔐 Security
+
+AuthenticityAI follows several security principles.
+
+Environment variables
+
+Sensitive configuration is stored outside source code.
+
+Never hardcode:
+
+API keys
+service-role keys
+database passwords
+private tokens
+authentication secrets
+
+Only safe public configuration may use VITE_ variables.
+
+Server-only secrets must never use a VITE_ prefix.
+
+.env
+
+The following should remain local:
+
+.env
+.env.local
+.env.production
+.env.development
+
+Only the following belongs in GitHub:
+
+.env.example
+
+The example file contains variable names and placeholders only.
+
+⚙️ Environment Variables
+
+Create a local .env file from .env.example.
+
+Example:
+
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+VITE_SUPABASE_PROJECT_ID=your_project_id
+
+SUPABASE_URL=your_project_url
+SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+
+LOVABLE_API_KEY=your_server_side_key
+
+The actual values should never be committed to GitHub.
+
+🚀 Local Development
+Prerequisites
+
+Install:
+
+Node.js
+npm
+Git
+Clone the repository
+git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+
+Enter the project directory:
+
+cd YOUR_REPOSITORY
+Install dependencies
 npm install
-npm run dev
-```
+Configure environment variables
 
-Copy `.env.example` to `.env` and fill in your own backend values when running outside the hosted
-environment.
+Copy:
 
-## Environment variables
-
-Copy the template and fill it in locally. `.env` and every other `.env.*` file are git-ignored;
-only `.env.example` (names and placeholders, never real values) belongs in the repository.
-
-```sh
 cp .env.example .env
-```
 
-| Variable | Scope | Purpose |
-| --- | --- | --- |
-| `VITE_SUPABASE_URL` | browser | Backend API URL. Public by design. |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | browser | Publishable (anon) key. Public by design; row-level security protects the data. |
-| `VITE_SUPABASE_PROJECT_ID` | browser | Backend project identifier. Public by design. |
-| `SUPABASE_URL` | server | Same URL, read by server functions. |
-| `SUPABASE_PUBLISHABLE_KEY` | server | Publishable key for server-side reads. |
-| `LOVABLE_API_KEY` | server only | Enables the optional AI narrative. Provisioned automatically in the hosted environment. |
+Then add your local configuration.
 
-Rules:
+Start development server
+npm run dev
 
-- Only `VITE_`-prefixed variables reach the browser bundle. Never give a private key a `VITE_`
-  prefix, and never hardcode one in `src/`.
-- Server-only values (`LOVABLE_API_KEY`, and a service-role key if you ever self-host) are read
-  inside server function handlers via `process.env` and never shipped to the client.
-- The app works without `LOVABLE_API_KEY`; the deterministic analysis and explanation still run.
+The application will be available through the local Vite development server.
 
-### If `.env` was ever committed
+🧪 Testing
 
-`.env` is git-ignored, but an ignore rule does not untrack a file that was already committed. Run
-this once in your clone and push:
+The project should be tested across the major analysis paths.
 
-```sh
-git rm --cached .env
-git commit -m "Stop tracking .env"
-git push
-```
+Image testing
 
-Only `.env.example` (placeholders) belongs in the repository. In the hosted environment private
-values are stored as platform secrets and injected into the server runtime — never written into a
-committed file.
+Test with:
 
+JPEG
+PNG
+WebP
+Different resolutions
+Different compression levels
+Images with and without EXIF
+Very small images
+Invalid files
+Audio testing
 
-## Database schema (`analyses`)
+Test with:
 
-`id`, `analysis_id`, `media_type`, `filename`, `status`, `image_score`, `audio_score`, `text_score`,
-`final_score`, `confidence`, `risk_level`, `features` (JSON), `evidence` (JSON),
-`score_contributions` (JSON), `explanation`, `limitations`, `analyzer_version`, `scoring_version`,
-`processing_time`, `created_at`.
+WAV
+MP3 where browser decoding is supported
+Mono audio
+Stereo audio
+Short clips
+Longer clips
+Silent audio
+Clipped audio
+Text testing
 
-## Limitations
+Test with:
 
-- Statistical signals, not proof: atypical measurements can come from editing, recompression or
-  platform re-encoding as easily as from synthesis.
-- Thresholds are documented heuristics, not calibrated against a labelled dataset.
-- Short inputs (small images, clips under two seconds, short passages) reduce confidence.
+Short text
+Long text
+Single paragraph
+Multiple paragraphs
+Repetitive text
+Text with different punctuation patterns
+Empty input
+Very long input
+Multimodal testing
 
-## Future work
+Test:
 
-Video analysis with temporal consistency, threshold calibration on public datasets, batch
-processing, and C2PA content-credential verification.
+Image only
+Audio only
+Text only
+Image + Audio
+Image + Text
+Audio + Text
+Image + Audio + Text
+📊 Determinism
 
-## License
+AuthenticityAI is designed to be deterministic.
 
-MIT — see [LICENSE](./LICENSE).
+For the same:
+
+Input
++
+Analyzer version
++
+Scoring configuration
+
+the system should produce the same measurements and score.
+
+The system does not intentionally generate random risk scores.
+
+This makes results easier to reproduce and debug.
+
+🚫 What AuthenticityAI Does NOT Claim
+
+AuthenticityAI does not claim to:
+
+Prove that content is fake
+Prove that content is authentic
+Identify every deepfake
+Detect every AI-generated image
+Detect every cloned voice
+Detect every AI-generated text
+Replace forensic investigation
+Provide legally admissible forensic evidence
+Achieve a specific accuracy percentage without validation
+Use a trained deepfake classifier when none is present
+
+The system is an analytical prototype based on measurable statistical signals.
+
+⚠️ Limitations
+
+The analysis should always be interpreted in context.
+
+Image limitations
+
+Image signals can be affected by:
+
+Social media compression
+Screenshotting
+Re-encoding
+Image resizing
+Editing software
+Camera processing
+Platform transformations
+
+Therefore, unusual image statistics do not automatically indicate manipulation.
+
+Audio limitations
+
+Audio measurements can be affected by:
+
+Microphone quality
+Background noise
+Compression
+Recording environment
+Codec differences
+Silence
+Clipping
+Very short recordings
+
+Therefore, audio anomalies do not automatically indicate voice cloning.
+
+Text limitations
+
+Text statistics can be affected by:
+
+Writing style
+Domain
+Language
+Editing
+Educational background
+Document length
+Human writing habits
+
+Therefore, linguistic statistics cannot reliably prove that text was generated by an AI model.
+
+Multimodal limitations
+
+Combining multiple signals does not automatically make the result forensic-grade.
+
+The final score is a structured aggregation of the project's scoring rules.
+
+It should therefore be interpreted as:
+
+Analytical Risk Assessment
+
+rather than:
+
+Definitive Authenticity Verdict
+🔬 Dataset & Model Transparency
+
+AuthenticityAI currently does not claim to use a custom-trained deepfake detection model.
+
+The current implementation focuses on:
+
+Real content
+      ↓
+Signal extraction
+      ↓
+Statistical analysis
+      ↓
+Evidence generation
+      ↓
+Risk scoring
+
+This is intentional.
+
+A machine-learning model should not be presented as a validated detector unless it has been trained and evaluated on an appropriate labelled dataset.
+
+Future versions may incorporate publicly available datasets and pretrained models after proper evaluation.
+
+🤖 AI Model Usage
+
+The optional AI layer is used for explanation, not for inventing the underlying measurements.
+
+Conceptually:
+
+                Raw Content
+                     │
+                     ▼
+          Deterministic Analyzer
+                     │
+                     ▼
+              Measured Signals
+                     │
+                     ▼
+              Risk Engine
+                     │
+                     ▼
+             Evidence + Score
+                     │
+                     ▼
+            Optional AI Model
+                     │
+                     ▼
+           Human-readable Report
+
+The AI model therefore acts primarily as an explanation layer.
+
+📈 Future Scope
+
+Potential future improvements include:
+
+1. Video Analysis
+
+Add:
+
+Frame-level analysis
+Temporal consistency
+Face tracking
+Lip-sync analysis
+Motion consistency
+Audio-video synchronization
+2. Machine Learning Models
+
+Introduce validated pretrained or custom models for:
+
+Deepfake image detection
+Synthetic speech detection
+AI-generated text detection
+
+Models should be evaluated using labelled datasets before their accuracy is reported.
+
+3. Public Dataset Evaluation
+
+Future versions can evaluate the system against appropriate datasets.
+
+Evaluation metrics could include:
+
+Accuracy
+Precision
+Recall
+F1-score
+ROC-AUC
+Confusion matrix
+False-positive rate
+False-negative rate
+
+These metrics should only be reported after actual experimental evaluation.
+
+4. Content Credentials
+
+Future versions may integrate:
+
+C2PA
+Content Credentials
+Provenance metadata
+Cryptographic verification
+5. Batch Processing
+
+Allow users to submit multiple files and generate aggregate reports.
+
+6. Advanced Reporting
+
+Future versions may support:
+
+PDF reports
+CSV exports
+JSON exports
+Shareable analysis links
+Comparison reports
+🎓 Academic Relevance
+
+AuthenticityAI demonstrates concepts from multiple areas of computer science:
+
+Artificial Intelligence
+AI-assisted explanation
+Feature-based analysis
+Intelligent decision support
+Machine Learning Concepts
+Feature extraction
+Classification concepts
+Model evaluation methodology
+Dataset requirements
+Digital Signal Processing
+FFT
+Spectral analysis
+Audio feature extraction
+Signal statistics
+Computer Vision
+Pixel analysis
+Image statistics
+Edge detection
+Compression artifact analysis
+Natural Language Processing
+Lexical statistics
+N-gram analysis
+Sentence analysis
+Text feature extraction
+Database Systems
+PostgreSQL
+Persistent analysis records
+JSON feature storage
+Querying and history
+Web Development
+React
+TypeScript
+REST/server functions
+Responsive UI
+Client-side processing
+📚 Project Workflow
+
+The complete workflow is:
+
+1. User submits content
+          ↓
+2. Input validation
+          ↓
+3. Content decoding
+          ↓
+4. Feature extraction
+          ↓
+5. Signal validation
+          ↓
+6. Evidence generation
+          ↓
+7. Modality risk scoring
+          ↓
+8. Multimodal fusion
+          ↓
+9. Confidence calculation
+          ↓
+10. Optional AI explanation
+          ↓
+11. Store analysis
+          ↓
+12. Display report
+🧩 Example Analysis
+
+A simplified example:
+
+Input:
+Image + Audio
+
+Image score:
+42
+
+Audio score:
+67
+
+Image weight:
+40%
+
+Audio weight:
+40%
+
+Since only two modalities are present:
+
+Normalized Image Weight = 50%
+Normalized Audio Weight = 50%
+
+Final score:
+
+(42 × 0.50) + (67 × 0.50)
+= 54.5
+≈ 55
+
+Risk level:
+
+55 → Moderate
+
+The system would then display the evidence and confidence associated with the measurements.
+
+🧭 Responsible Use
+
+AuthenticityAI is intended for:
+
+Educational research
+Academic projects
+Demonstration of multimodal analysis
+Media-literacy experiments
+Research prototypes
+Exploratory content analysis
+
+It should not be used as the sole basis for:
+
+Legal decisions
+Employment decisions
+Financial decisions
+Criminal allegations
+Academic misconduct accusations
+Identity verification
+High-stakes investigations
+
+Users should treat the result as an analytical signal rather than a definitive conclusion.
+
+📌 Project Status
+
+Status: Active academic project / research prototype
+
+Current capabilities:
+
+✅ Image analysis
+✅ Audio analysis
+✅ Text analysis
+✅ Multimodal scoring
+✅ Evidence generation
+✅ Confidence calculation
+✅ Risk classification
+✅ Persistent analysis history
+✅ Dashboard
+✅ Reports
+✅ Methodology documentation
+✅ Optional AI explanation
+✅ Responsive web interface
+
+Planned:
+
+⏳ Video analysis
+⏳ Validated ML models
+⏳ Public dataset evaluation
+⏳ C2PA verification
+⏳ Batch analysis
+👨‍💻 Author
+
+Fahad Afzal Hussain
+
+B.Tech Information Technology
+Bharati Vidyapeeth's College of Engineering, Delhi
