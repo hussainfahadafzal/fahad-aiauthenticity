@@ -1090,7 +1090,9 @@ Planned:
 ⏳ Public dataset evaluation
 ⏳ C2PA verification
 ⏳ Batch analysis
-👨‍💻 Author
+
+
+👨‍💻 Author:
 
 Fahad Afzal Hussain
 
