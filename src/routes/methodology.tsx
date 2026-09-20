@@ -27,31 +27,10 @@ const STAGES = [
   { n: 1, title: "Input", body: "File or text is received in the browser. No filename heuristics are used anywhere." },
   { n: 2, title: "Decode", body: "Canvas 2D for images, AudioContext.decodeAudioData for audio, tokenisation for text." },
   { n: 3, title: "Feature extraction", body: "Statistical descriptors: pixel/frequency statistics, FFT spectral measures, stylometry." },
-  { n: 4, title: "Model inference", body: "Image and audio bytes are sent server-side to a public pretrained classifier; an unreachable model is reported, never simulated." },
-  { n: 5, title: "Signal evaluation", body: "Each feature is compared with a documented threshold and becomes an evidence item." },
-  { n: 6, title: "Early fusion", body: "Per modality: forensic feature score blended with the model probability (default 50/50); 100% features when inference is unavailable." },
-  { n: 7, title: "Late fusion", body: "Modality scores are combined with weights re-normalised over the modalities present." },
-  { n: 8, title: "Confidence", body: "A separate value from completeness, feature validity, signal coverage and whether a model could be consulted." },
-  { n: 9, title: "Persistence", body: "The full report — features, evidence, model status, contributions — is stored for review and export." },
-];
-
-const MODEL_NOTES = [
-  {
-    title: "Image classifier",
-    body: `Default ${DEFAULT_SETTINGS.imageModel} — a publicly published transformer image classifier fine-tuned upstream to separate human-made from diffusion-generated images. Integrated, not trained here.`,
-  },
-  {
-    title: "Audio classifier",
-    body: `Default ${DEFAULT_SETTINGS.audioModel} — a publicly published wav2vec2 audio-classification checkpoint fine-tuned upstream on bona-fide versus synthesised speech. Integrated, not trained here.`,
-  },
-  {
-    title: "Text",
-    body: "No text classifier is active. Text risk comes entirely from deterministic linguistic features: type-token ratio, hapax ratio, repeated n-grams, sentence-length variance and punctuation statistics.",
-  },
-  {
-    title: "Dataset provenance",
-    body: "Each upstream model card is linked in every report. Upstream training sets are not fully published, so no accuracy figure is claimed and no threshold is calibrated against a labelled benchmark.",
-  },
+  { n: 4, title: "Signal evaluation", body: "Each feature is compared with a documented threshold and becomes an evidence item." },
+  { n: 5, title: "Scoring", body: "Evidence contributions are summed per modality, then fused with normalised weights." },
+  { n: 6, title: "Confidence", body: "A separate value from data completeness, feature validity and signal coverage." },
+  { n: 7, title: "Persistence", body: "The full report — features, evidence, contributions — is stored for review and export." },
 ];
 
 function Formula({ title, expression, note }: { title: string; expression: string; note: string }) {
@@ -71,9 +50,8 @@ function MethodologyPage() {
     <AppShell>
       <h1 className="text-2xl font-semibold">Methodology</h1>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        AuthenticityAI combines interpretable signal measurement with inference from publicly
-        available pretrained classifiers. It trains no model of its own. Every number in a report is
-        derived from the content you submit or from a real model response — never from a placeholder.
+        AuthenticityAI is a signal-measurement system, not a trained classifier. Every number in a
+        report is derived from the content you submit, using the pipeline below.
       </p>
 
       <section className="mt-8">
@@ -105,19 +83,14 @@ function MethodologyPage() {
             note={`Defaults: image ${DEFAULT_SETTINGS.weights.image}, audio ${DEFAULT_SETTINGS.weights.audio}, text ${DEFAULT_SETTINGS.weights.text}. Absent modalities are dropped before normalising.`}
           />
           <Formula
-            title="Early fusion inside a modality"
-            expression={`score_m = round( (1−λ)·featureScore_m + λ·100·P_model(synthetic) )\nλ = 0 when model status ≠ AVAILABLE`}
-            note={`λ defaults to ${DEFAULT_SETTINGS.mlWeight} and is configurable in Settings. If inference is NOT_CONFIGURED, UNAVAILABLE or ERROR the modality score is 100% local signals and the report says so.`}
-          />
-          <Formula
             title="Fused risk score"
             expression={`final = round( Σ_{m ∈ present} score_m · w'_m )`}
             note="Only modalities actually supplied take part in the fusion."
           />
           <Formula
             title="Confidence (independent of risk)"
-            expression={`base = 100 · ( 0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence )\nconfidence = clamp( base + 5·modelsUsed − 8·modelsMissing , 0 , 99 )`}
-            note="Completeness = measurable feature groups; validity = input size/length adequacy; coverage = measured signals ÷ expected signals. Successful model inference raises confidence; a model that was requested but unreachable lowers it."
+            expression={`confidence = 100 · ( 0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence )`}
+            note="Completeness = measurable feature groups; validity = input size/length adequacy; coverage = measured signals ÷ expected signals."
           />
           <Formula
             title="Shannon entropy (image texture)"
@@ -142,31 +115,12 @@ function MethodologyPage() {
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold">Pretrained model integration</h2>
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {MODEL_NOTES.map((m) => (
-            <div key={m.title} className="panel p-4">
-              <h3 className="text-sm font-semibold">{m.title}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{m.body}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-4 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          Inference runs server-side so the API token never reaches the browser. If the token is
-          absent the status is NOT_CONFIGURED; if the endpoint fails it is UNAVAILABLE or ERROR. In
-          every one of those cases the report states “ML model unavailable — using local signal
-          analysis” and the final risk is calculated without model inference.
-        </p>
-      </section>
-
       <section className="panel mt-10 p-5">
         <h2 className="text-lg font-semibold">Determinism guarantee</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The local engine contains no random number generation and no filename inspection.
-          Re-analysing identical content with identical settings reproduces identical features,
-          identical evidence and an identical feature score. Model probabilities come from a fixed
-          upstream checkpoint revision, which is recorded in each report.
+          The engine contains no random number generation, no pretrained weights and no
+          filename inspection. Re-analysing identical content with identical settings reproduces
+          identical features, identical evidence and an identical score.
         </p>
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">{DISCLAIMER}</p>
       </section>

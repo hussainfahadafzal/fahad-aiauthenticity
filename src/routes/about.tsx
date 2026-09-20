@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
 import { ANALYZER_VERSION, DISCLAIMER, SCORING_VERSION } from "@/lib/analysis/types";
-import { DEFAULT_SETTINGS } from "@/lib/analysis/config";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -24,8 +23,7 @@ const STACK = [
   ["Image analysis", "Canvas 2D pixel access, Sobel/Laplacian operators, histogram entropy, EXIF byte scan"],
   ["Audio analysis", "Web Audio AudioContext decoding, Hann windowing, radix-2 FFT, spectral descriptors"],
   ["Text analysis", "Tokenisation, stylometry, n-gram repetition, punctuation and register statistics"],
-  ["Model inference", `Server-side calls to public pretrained classifiers (${DEFAULT_SETTINGS.imageModel} for images, ${DEFAULT_SETTINGS.audioModel} for audio)`],
-  ["Persistence", "Managed PostgreSQL through the project backend, one row per analysis with full JSON evidence and model status"],
+  ["Persistence", "Managed PostgreSQL through the project backend, one row per analysis with full JSON evidence"],
   ["Optional AI", "Server-side narrative synthesis constrained to the measured values"],
 ];
 
@@ -36,10 +34,9 @@ function AboutPage() {
         <h1 className="text-2xl font-semibold">About AuthenticityAI</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           AuthenticityAI is an academic and portfolio project that demonstrates an explainable
-          approach to content-authenticity assessment. It measures signals that can be computed,
-          optionally consults publicly available pretrained classifiers, shows every measurement and
-          model response, and explains what they can and cannot support. It does not train models
-          from scratch.
+          approach to content-authenticity assessment. Instead of claiming a verdict, it measures
+          signals that can be computed, shows every measurement, and explains what those
+          measurements can and cannot support.
         </p>
 
         <section className="mt-8">
@@ -57,22 +54,10 @@ function AboutPage() {
         <section className="mt-8">
           <h2 className="text-lg font-semibold">Ethics and honest scope</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-            <li>
-              No model is trained from scratch here. The project integrates publicly available
-              pretrained classifiers and combines their real probabilities with interpretable
-              modality features through a deterministic fusion step.
-            </li>
-            <li>
-              Upstream training data is only as documented by each model’s publisher; where the
-              manifest is incomplete the report says so.
-            </li>
-            <li>
-              No prediction is ever simulated. If a model is not configured or unreachable, the
-              status is shown as such and the risk is calculated from local signals alone.
-            </li>
+            <li>No trained deepfake classifier is used, and none is claimed.</li>
             <li>No accuracy figure is reported, because no labelled evaluation is performed.</li>
             <li>Results must never be used as forensic proof or to accuse a person.</li>
-            <li>Every score can be traced back to the exact measurement or model response that produced it.</li>
+            <li>Every score can be traced back to the exact measurement that produced it.</li>
           </ul>
         </section>
 

@@ -25,8 +25,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { riskTextClass } from "@/components/ScoreDial";
-import { ModelStatusBadge } from "@/components/ModelStatusBadge";
-import { isModelUsable } from "@/lib/ml/types";
 import { deleteAnalysis, listAnalyses } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -142,7 +140,7 @@ function HistoryPage() {
 
       {rows.length > 0 && (
         <div className="panel mt-6 overflow-x-auto">
-          <table className="w-full min-w-[980px] text-sm">
+          <table className="w-full min-w-[720px] text-sm">
             <caption className="sr-only">Stored analyses</caption>
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-muted-foreground">
@@ -151,8 +149,6 @@ function HistoryPage() {
                 <th scope="col" className="px-4 py-3">Score</th>
                 <th scope="col" className="px-4 py-3">Risk</th>
                 <th scope="col" className="px-4 py-3">Confidence</th>
-                <th scope="col" className="px-4 py-3">Model status</th>
-                <th scope="col" className="px-4 py-3">Model prediction</th>
                 <th scope="col" className="px-4 py-3">Date</th>
                 <th scope="col" className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -170,32 +166,6 @@ function HistoryPage() {
                     {r.riskLevel}
                   </td>
                   <td className="px-4 py-3 font-mono">{r.confidence}%</td>
-                  <td className="px-4 py-3">
-                    <div className="space-y-1">
-                      {[r.imageModel, r.audioModel].filter(Boolean).length === 0 ? (
-                        <span className="text-xs text-muted-foreground">No model requested</span>
-                      ) : (
-                        [r.imageModel, r.audioModel]
-                          .filter((m): m is NonNullable<typeof m> => Boolean(m))
-                          .map((m) => (
-                            <ModelStatusBadge key={m.modality} status={m.status} className="block" />
-                          ))
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-xs">
-                    {[r.imageModel, r.audioModel].filter(isModelUsable).length === 0 ? (
-                      <span className="text-muted-foreground">Local analysis used</span>
-                    ) : (
-                      [r.imageModel, r.audioModel]
-                        .filter(isModelUsable)
-                        .map((m) => (
-                          <p key={m!.modality} className="font-mono">
-                            {m!.modality}: {m!.prediction} ({Math.round((m!.probability ?? 0) * 100)}%)
-                          </p>
-                        ))
-                    )}
-                  </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(r.createdAt).toLocaleString()}
                   </td>

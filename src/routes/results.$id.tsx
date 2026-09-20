@@ -6,9 +6,6 @@ import { Download, Printer } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AudioVisualizer } from "@/components/AudioVisualizer";
 import { EvidenceCard } from "@/components/EvidenceCard";
-import { ModelInfoCard } from "@/components/ModelInfoCard";
-import { ModelStatusBadge } from "@/components/ModelStatusBadge";
-import { ML_UNAVAILABLE_NOTICE } from "@/lib/ml/types";
 import { ScoreDial, riskTextClass } from "@/components/ScoreDial";
 import { Button } from "@/components/ui/button";
 import { DISCLAIMER } from "@/lib/analysis/types";
@@ -174,48 +171,6 @@ function ResultsPage() {
           </dl>
         </section>
       </div>
-
-      <section className="panel mt-4 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">Pretrained model inference</h2>
-          <div className="flex flex-wrap gap-4">
-            {data.imageModel && <ModelStatusBadge status={data.imageModel.status} />}
-            {data.audioModel && <ModelStatusBadge status={data.audioModel.status} />}
-          </div>
-        </div>
-        {!data.imageModel && !data.audioModel ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            No model inference was requested for this analysis. {ML_UNAVAILABLE_NOTICE}
-          </p>
-        ) : (
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            {data.imageModel && (
-              <ModelInfoCard inference={data.imageModel} fusion={data.fusion.image} />
-            )}
-            {data.audioModel && (
-              <ModelInfoCard inference={data.audioModel} fusion={data.fusion.audio} />
-            )}
-          </div>
-        )}
-        {data.fusion.text && (
-          <p className="mt-4 rounded-md border border-border bg-surface p-3 text-xs text-muted-foreground">
-            Text risk {data.fusion.text.fusedScore}/100 is derived entirely from linguistic feature
-            extraction (type-token ratio, repeated n-grams, sentence-length variance, punctuation
-            statistics). No text classifier is active, so this is not a model prediction.
-          </p>
-        )}
-        {data.modelErrors.length > 0 && (
-          <ul className="mt-4 space-y-1 text-xs text-risk-high">
-            {data.modelErrors.map((e) => (
-              <li key={e}>{e}</li>
-            ))}
-          </ul>
-        )}
-        <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-          AuthenticityAI integrates publicly available pretrained classifiers; it does not train any
-          model. Model predictions and local forensic signals are reported separately and then fused.
-        </p>
-      </section>
 
       {data.explanation && (
         <section className="panel mt-4 p-5">

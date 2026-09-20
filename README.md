@@ -11,12 +11,7 @@ and an honest statement of limitations.
 
 ## Honest scope
 
-- **No model is trained from scratch.** The project integrates publicly available pretrained
-  classifiers and fuses their real probabilities with interpretable modality features.
-- If no inference token is configured, or the endpoint fails, the status is reported as
-  `NOT_CONFIGURED` / `UNAVAILABLE` / `ERROR` and the report states
-  *"ML model unavailable — using local signal analysis. Final risk calculated without ML model
-  inference."* No prediction is ever simulated.
+- No trained deepfake classifier, and none is claimed.
 - No random numbers, hardcoded verdicts or fake accuracy percentages.
 - No filename-based detection — decisions come from decoded content only.
 - No seeded demo history: the dashboard is empty until you run a real analysis.
@@ -33,25 +28,10 @@ and an honest statement of limitations.
 
 Pages: Landing, Dashboard, New Analysis, Results, History, Reports, Methodology, Settings, About.
 
-## Pretrained model integration
-
-| Modality | Default model | Role |
-| --- | --- | --- |
-| Image | `Organika/sdxl-detector` | Public transformer classifier (human-made vs diffusion-generated) |
-| Audio | `MelodyMachine/Deepfake-audio-detection-V2` | Public wav2vec2 checkpoint (bona-fide vs synthesised speech) |
-| Text | none | Deterministic stylometry only — clearly labelled as feature-based |
-
-Inference runs server-side through a TanStack server function, so the token never reaches the
-browser. Configure `HUGGINGFACE_API_KEY` (or `HF_TOKEN`) as a backend secret; models, weight and a
-custom endpoint are configurable in **Settings**, which also has a live status check. Training-data
-provenance is quoted from each upstream model card; where the manifest is incomplete, the report
-says so, and no accuracy figure is claimed.
-
 ## Scoring model
 
 ```
-featureScore_m = clamp( Σ evidence contributions , 0 , 100 )
-score_m        = round( (1−λ)·featureScore_m + λ·100·P_model(synthetic) )   # λ = 0 unless model AVAILABLE
+score_m    = clamp( Σ evidence contributions , 0 , 100 )
 w'_m       = w_m / Σ_{k ∈ present} w_k
 final      = round( Σ score_m · w'_m )
 confidence = 100 · (0.30·completeness + 0.30·validity + 0.20·coverage + 0.20·meanSignalConfidence)
